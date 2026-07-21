@@ -6,7 +6,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.kychnoo.jnotes.data.model.note.NoteBlock
 import com.kychnoo.jnotes.domain.model.BlockType
-import kotlinx.serialization.json.Json
 import java.util.UUID
 
 @Entity(
@@ -38,7 +37,7 @@ data class NoteBlockEntity(
             noteId = noteId,
             type = noteBlock.blockType,
             orderIndex = orderIndex,
-            payloadJson = Json.encodeToString(noteBlock)
+            payloadJson = noteBlock.toJson()
         )
     }
 }

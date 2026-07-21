@@ -1,6 +1,7 @@
 package com.kychnoo.jnotes.data.repository
 
 import com.kychnoo.jnotes.R
+import com.kychnoo.jnotes.core.ext.onAsyncFailure
 import com.kychnoo.jnotes.crypto.EncryptedFileManager
 import com.kychnoo.jnotes.crypto.NoteCryptoManager
 import com.kychnoo.jnotes.data.local.dao.NoteDao
@@ -8,12 +9,11 @@ import com.kychnoo.jnotes.data.local.entity.NoteBlockEntity
 import com.kychnoo.jnotes.data.local.entity.NoteEntity
 import com.kychnoo.jnotes.data.model.note.DecryptedNote
 import com.kychnoo.jnotes.data.model.note.EncryptedNote
+import com.kychnoo.jnotes.data.model.note.MediaBlock
 import com.kychnoo.jnotes.data.model.note.NoteBlock
 import com.kychnoo.jnotes.data.model.note.toNoteBlock
 import com.kychnoo.jnotes.provider.ResourceProvider
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 import javax.inject.Inject
 
 class NoteRepository @Inject constructor(
@@ -37,10 +37,7 @@ class NoteRepository @Inject constructor(
             val payload = note.encryptedPayload ?: throw IllegalStateException("No payload found for encrypted note")
             cryptoManager.decryptNote(password, EncryptedNote(note.encryptedTitle, payload))
         }
-    }.onFailure { th ->
-        if (th is CancellationException) throw th
-        th.printStackTrace()
-    }
+    }.onAsyncFailure()
 
     suspend fun saveNote(
         title: String,
@@ -68,8 +65,24 @@ class NoteRepository @Inject constructor(
             }
             noteDao.insertFullNote(note = createdNote, blocks = noteBlocks)
         }
-    }.onFailure { th ->
-        if (th is CancellationException) throw th
-        th.printStackTrace()
-    }
+    }.onAsyncFailure()
+
+    suspend fun deleteNote(noteId: String): Result<Unit> = runCatching {
+        noteDao.getBlocksForNote(noteId).forEach { block ->
+            if (block.type.isMedia) {
+                runCatching {
+                    val noteBlock = NoteBlock.fromJSON(block.payloadJson)
+                    if (noteBlock is MediaBlock) {
+                        fileManager.deleteFile(noteBlock.uri)
+                    }
+                }.onFailure { fileEx ->
+                    fileEx.printStackTrace()
+                }
+            }
+        }
+        noteDao.deleteNoteById(noteId)
+    }.onAsyncFailure()
+
+    suspend fun togglePin(noteId: String): Result<Unit>
+        = runCatching { noteDao.togglePin(noteId) }.onAsyncFailure()
 }

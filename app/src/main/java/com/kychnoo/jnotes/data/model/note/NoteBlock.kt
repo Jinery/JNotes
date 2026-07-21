@@ -3,6 +3,7 @@ package com.kychnoo.jnotes.data.model.note
 import com.kychnoo.jnotes.domain.model.BlockType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 sealed class NoteBlock {
@@ -11,6 +12,14 @@ sealed class NoteBlock {
         is Image -> BlockType.IMAGE
         is Audio -> BlockType.AUDIO
         is Video -> BlockType.VIDEO
+    }
+
+    fun toJson(): String = Json.encodeToString(this)
+
+    companion object {
+        fun fromJSON(json: String) : NoteBlock {
+            return Json.decodeFromString(json)
+        }
     }
 
     @Serializable

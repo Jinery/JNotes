@@ -8,6 +8,7 @@ enum class BlockType {
     TEXT,
     IMAGE,
     AUDIO,
-    VIDEO,
-    LINK_PREVIEW
+    VIDEO;
+
+        val isMedia: Boolean get() = this != TEXT
 }
