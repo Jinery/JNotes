@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">JNotes</string>
+
+    <string name="encrypted_note_title">Encrypted Note</string>
+</resources>
