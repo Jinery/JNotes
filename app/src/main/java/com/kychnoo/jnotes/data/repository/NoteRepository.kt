@@ -7,6 +7,7 @@ import com.kychnoo.jnotes.crypto.NoteCryptoManager
 import com.kychnoo.jnotes.data.local.dao.NoteDao
 import com.kychnoo.jnotes.data.local.entity.NoteBlockEntity
 import com.kychnoo.jnotes.data.local.entity.NoteEntity
+import com.kychnoo.jnotes.data.local.relation.NoteWithBlocks
 import com.kychnoo.jnotes.data.model.note.DecryptedNote
 import com.kychnoo.jnotes.data.model.note.EncryptedNote
 import com.kychnoo.jnotes.data.model.note.MediaBlock
@@ -23,6 +24,7 @@ class NoteRepository @Inject constructor(
     private val resourceProvider: ResourceProvider
 ) {
     fun getAllNotes(): Flow<List<NoteEntity>> = noteDao.getAllNotes()
+    fun getAllNotesWithBlocks(): Flow<List<NoteWithBlocks>> = noteDao.getNotesWithBlocks()
     fun getNoteById(id: String): Flow<NoteEntity?> = noteDao.getNoteById(id)
 
     suspend fun getDecryptedNote(noteId: String, password: String): Result<DecryptedNote?> = runCatching {

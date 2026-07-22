@@ -2,4 +2,10 @@
     <string name="app_name">JNotes</string>
 
     <string name="encrypted_note_title">Encrypted Note</string>
+
+    <string name="loading_error">Loading error</string>
+
+    <string name="retry">Retry</string>
+
+    <string name="no_notes">You don\'t have any notes\nCreate First using + button.</string>
 </resources>
