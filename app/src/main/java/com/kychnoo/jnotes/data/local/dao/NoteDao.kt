@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.kychnoo.jnotes.data.local.entity.NoteBlockEntity
 import com.kychnoo.jnotes.data.local.entity.NoteEntity
+import com.kychnoo.jnotes.data.local.relation.NoteWithBlocks
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,6 +17,10 @@ interface NoteDao {
 
     @Query("SELECT * FROM notes WHERE id = :id")
     fun getNoteById(id: String): Flow<NoteEntity?>
+
+    @Transaction
+    @Query("SELECT * FROM notes ORDER BY isPinned DESC, updatedAt DESC")
+    fun getNotesWithBlocks(): Flow<List<NoteWithBlocks>>
 
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun getNoteByIdSync(id: String): NoteEntity?
